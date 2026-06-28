@@ -1,0 +1,16 @@
+spring:
+  application:
+    name: user-service
+
+
+  datasource:
+    url: jdbc:mysql://localhost:3307/invoice_app_db
+    username: invoiceApp
+    password: invoiceApp
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+server:
+  port: 8081
