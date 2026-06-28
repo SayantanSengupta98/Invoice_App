@@ -14,3 +14,15 @@ spring:
     show-sql: true
 server:
   port: 8081
+
+
+jwt:
+  secret: myDummySecretKeyzR+4qzL6KQ+8Jt4g0dR1nXQ3bM5qP1FvY9sE2Wc7hUk=
+  expiration: 10
+
+
+logging:
+  level:
+    root: INFO
+    org.hibernate.SQL: DEBUG
+    com.learn.user_service: DEBUG
