@@ -1,0 +1,7 @@
+spring:
+  application:
+    name: apigw-service
+
+
+server:
+  port: 9000

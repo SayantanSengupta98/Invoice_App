@@ -52,7 +52,7 @@ public class UserService {
     public ResponseEntity<?> login(UserReqDto u) {
 
         log.debug("auth start");
-        User user = userRepository.findByUsername(u.userName());
+        User user = userRepository.findByUserEmail(u.userEmail());
 
         if (!CommonUtil.isAuthenticated(u, passwordEncoder).test(user)) {
             return ResponseEntity.status(401).body("Invalid credentials");

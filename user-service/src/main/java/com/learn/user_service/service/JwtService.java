@@ -40,7 +40,7 @@ public class JwtService {
                 .header().add("typ", "JWT")
                 .and()
 
-                .subject(userDetails.getUsername())
+                .subject(userDetails.getUserId())
                 .claims().add(claims)
                 .issuedAt(now)
                 .expiration(expiryDate)
