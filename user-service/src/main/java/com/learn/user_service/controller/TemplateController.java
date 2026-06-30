@@ -23,7 +23,7 @@ public class TemplateController {
 
 
     @PostMapping
-    public ResponseEntity<?> saveTemplate(@RequestHeader String authorization)
+    public ResponseEntity<?> createTemplate(@RequestHeader String authorization)
     {
         log.debug("Saving template for user: {}", authorization);
         return ResponseEntity.ok("Template saved successfully for user: ");

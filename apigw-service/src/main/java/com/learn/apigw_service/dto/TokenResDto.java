@@ -1,4 +1,4 @@
-package com.learn.user_service.dto;
+package com.learn.apigw_service.dto;
 
 public record TokenResDto(String token, String status) {
 }

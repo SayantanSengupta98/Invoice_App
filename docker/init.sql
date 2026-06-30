@@ -1,0 +1,1 @@
+CREATE DATABASE IF NOT EXISTS invoice_app_user_service_db;

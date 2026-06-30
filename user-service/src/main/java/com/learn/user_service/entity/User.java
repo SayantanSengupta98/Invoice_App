@@ -1,12 +1,12 @@
 package com.learn.user_service.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Data
@@ -15,14 +15,21 @@ import lombok.RequiredArgsConstructor;
 public class User {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
     String userId;
 
-    String username;
-
-    String password;
+    String userName;
 
     String userEmail;
 
-    String currentTemplate;
+    String shopName;
+
+    @OneToMany(mappedBy = "user",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true)
+    private List<Template> savedTemplates = new ArrayList<>();
+
+    @OneToOne
+    @JoinColumn(name = "current_template_id")
+    private Template currentTemplate;
 }
+

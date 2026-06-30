@@ -2,6 +2,27 @@ spring:
   application:
     name: apigw-service
 
+  datasource:
+    url: jdbc:mysql://localhost:3307/invoice_app_user_auth_db
+    username: invoiceApp
+    password: invoiceApp
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+
+
+jwt:
+  secret: myDummySecretKeyzR+4qzL6KQ+8Jt4g0dR1nXQ3bM5qP1FvY9sE2Wc7hUk=
+  expiration: 30
+
+
+logging:
+  level:
+    root: INFO
+    org.hibernate.SQL: DEBUG
+    com.learn.apigw_service: DEBUG
 
 server:
   port: 9000

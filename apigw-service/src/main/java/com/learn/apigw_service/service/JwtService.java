@@ -1,12 +1,11 @@
-package com.learn.user_service.service;
+package com.learn.apigw_service.service;
 
-import com.learn.user_service.entity.User;
+import com.learn.apigw_service.entity.User;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import javax.crypto.SecretKey;
@@ -33,7 +32,7 @@ public class JwtService {
         log.debug("Token expiration time: {}", expiryDate);
 
         Map<String, Object> claims = Map.of(
-                "userName", userDetails.getUsername(),
+                "userName", userDetails.getUserName(),
                 "userEmail", userDetails.getUserEmail());
 
         return Jwts.builder()
@@ -55,15 +54,34 @@ public class JwtService {
         );
     }
 
-    public String extractUsername(String token) {
-        return extractAllClaims(token).getSubject();
+    public String extractUserid(String token) {
+        return String.valueOf(extractAllClaims(token).getSubject());
     }
 
-    public boolean isTokenValid(String token, UserDetails userDetails) {
 
+    public String extractUsername(String token) {
+        return String.valueOf(extractAllClaims(token).get("userName"));
+    }
+
+    public String extractEmail(String token) {
+        return String.valueOf(extractAllClaims(token).get("userEmail"));
+    }
+
+    public boolean isTokenValid(String token, User userDetails) {
+
+        String userEmail = extractEmail(token);
         String username = extractUsername(token);
 
-        return username.equals(userDetails.getUsername())
+        log.debug("Extracted username from JWT: {}", username);
+        log.debug("Extracted user email from JWT: {}", userEmail);
+
+        log.debug("User details username: {}", userDetails.getUserName());
+        log.debug("User details email: {}", userDetails.getUserEmail());
+
+
+
+        return username.equals(userDetails.getUserName())
+                && userEmail.equals(userDetails.getUserEmail())
                 && !isTokenExpired(token);
     }
 

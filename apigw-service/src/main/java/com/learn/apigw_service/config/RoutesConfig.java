@@ -20,8 +20,9 @@ public class RoutesConfig {
                 .build()
 
                 .and(GatewayRouterFunctions.route("user_service")
-                .route(RequestPredicates.path("/api/user/**"), HandlerFunctions.http())
-                .before(BeforeFilterFunctions.uri("http://localhost:8081")).build());
+                        .route(RequestPredicates.path("/api/user/**"), HandlerFunctions.http())
+                        .before(BeforeFilterFunctions.uri("http://localhost:8081"))
+                        .build());
     }
 }
 
