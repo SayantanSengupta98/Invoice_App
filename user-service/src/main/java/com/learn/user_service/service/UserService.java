@@ -1,11 +1,9 @@
 package com.learn.user_service.service;
 
-import com.learn.user_service.dto.UserResDto;
 import com.learn.user_service.entity.User;
 import com.learn.user_service.model.AuthUserDetails;
 import com.learn.user_service.repository.UserRepository;
 import com.learn.user_service.util.CommonUtil;
-import com.learn.user_service.util.Constants;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -21,20 +19,23 @@ public class UserService {
     private final UserRepository userRepository;
     private final ObjectMapper objectMapper;
 
-    public UserResDto saveUserShopName(String authHeader, String shopName) {
+    public User saveUserShopName(String authHeader, String shopName) {
         AuthUserDetails authUserDetails = CommonUtil.extractUserDetailsFromToken(authHeader, objectMapper);
         Optional<User> user = userRepository.findByUserEmail(authUserDetails.userEmail());
 
+        return saveUserIfNotPresent(shopName, user, authUserDetails);
+    }
 
+    public User saveUserIfNotPresent(String shopName, Optional<User> user, AuthUserDetails authUserDetails) {
+        User savedUser = null;
         if (user.isPresent()) {
+            savedUser = user.get();
             log.info("User already exists with email: {}", authUserDetails.userEmail());
-            if (!shopName.equals(user.get().getShopName())) {
+            if (shopName != null && !shopName.equals(user.get().getShopName())) {
                 log.info("Updating user's shop name {}", shopName);
-                User savedUser = user.get();
                 savedUser.setShopName(shopName);
-                userRepository.save(savedUser);
+                savedUser = userRepository.save(savedUser);
             }
-
         }
         else {
             log.info("Creating the user with email: {}", authUserDetails.userEmail());
@@ -43,10 +44,15 @@ public class UserService {
             newUser.setUserName(authUserDetails.userName());
             newUser.setUserEmail(authUserDetails.userEmail());
             newUser.setShopName(shopName);
-            userRepository.save(newUser);
+            savedUser = userRepository.save(newUser);
         }
+        return savedUser;
+    }
 
+    public User findUser(String authHeader) {
+        AuthUserDetails authUserDetails = CommonUtil.extractUserDetailsFromToken(authHeader, objectMapper);
+        Optional<User> user = userRepository.findByUserEmail(authUserDetails.userEmail());
 
-        return new UserResDto("User shop name saved successfully, for userName " + authUserDetails.userName() + ".", Constants.SUCCESS);
+        return user.orElse(null);
     }
 }

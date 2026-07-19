@@ -1,5 +1,6 @@
 package com.learn.user_service.entity;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -30,6 +31,7 @@ public class User {
 
     @OneToOne
     @JoinColumn(name = "current_template_id")
+    @JsonManagedReference
     private Template currentTemplate;
 }
 

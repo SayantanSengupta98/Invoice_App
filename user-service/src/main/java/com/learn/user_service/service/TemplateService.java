@@ -4,16 +4,16 @@ import com.learn.user_service.entity.Template;
 import com.learn.user_service.entity.User;
 import com.learn.user_service.model.AuthUserDetails;
 import com.learn.user_service.repository.TemplateRepository;
-import com.learn.user_service.repository.UserRepository;
 import com.learn.user_service.util.CommonUtil;
 import com.learn.user_service.util.Constants;
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.stereotype.Service;
 import tools.jackson.databind.ObjectMapper;
 
-import java.util.Optional;
+import java.util.List;
 
 @Slf4j
 @Service
@@ -22,62 +22,44 @@ public class TemplateService {
 
     private final ChatClient chatClient;
     private final ObjectMapper objectMapper;
-    private final UserRepository userRepository;
+    private final UserService userService;
     private final TemplateRepository templateRepository;
 
 
     public String generateTemplate(String authHeader) {
 
-        //saveUserwithTemplate(authHeader);
+        log.debug("Generating template with AI for user started" );
 
         String htmlContent = chatClient.prompt(Constants.TEMPLATE_PROMPT).call().content();
 
-        //String htmlContent = "abc";
+        log.debug("AI Generated HTML content: {}", htmlContent);
 
-        Long templateId = saveUserWithTemplate(authHeader, htmlContent);
-        return templateId.toString();
+        return htmlContent;
     }
 
-
-    private Long saveUserWithTemplate(String authHeader, String htmlContent) {
-
+    public Long saveUserWithTemplate(String authHeader, @NonNull String htmlContent) {
         // Implementation for saving user with template
-        AuthUserDetails authUserDetails = CommonUtil.extractUserDetailsFromToken(authHeader, objectMapper);
         Template template = new Template();
         template.setTemplateHtmlContent(htmlContent);
-        template.setTemplateName(authUserDetails.userEmail().concat("_").concat(String.valueOf(System.currentTimeMillis())));
 
+        User savedUser = userService.saveUserShopName(authHeader, null);
 
-        verifyExtractedUser(authUserDetails);
+        template.setTemplateName(savedUser.getUserEmail().concat("_").concat(String.valueOf(System.currentTimeMillis())));
 
-        Optional<User> user = userRepository.findByUserEmail(authUserDetails.userEmail());
-
-
-        if (user.isPresent()) {
-            template.setUser(user.get());
-
+        if (savedUser.getCurrentTemplate() == null) {
+            savedUser.setCurrentTemplate(template);
         }
-        else {
-
-            User newUser = new User();
-            newUser.setUserId(authUserDetails.userId());
-            newUser.setUserName(authUserDetails.userName());
-            newUser.setUserEmail(authUserDetails.userEmail());
-            newUser.setCurrentTemplate(template);
-
-            template.setUser(newUser);
-        }
+        template.setUser(savedUser);
 
         Template savedTemplate = templateRepository.save(template);
 
         return savedTemplate.getTemplateId();
     }
 
-    private static void verifyExtractedUser(AuthUserDetails userDetails) {
-        if (userDetails == null) {
-            log.error("User details could not be extracted from token.");
-            throw new RuntimeException("User details could not be extracted from token.");
-        }
+    public List<Template> findAllTemplatesByUser(String authHeader)
+    {
+        AuthUserDetails authUserDetails = CommonUtil.extractUserDetailsFromToken(authHeader, objectMapper);
+        // Implementation for finding all templates by user
+        return templateRepository.findByUserId(authUserDetails.userId());
     }
-
 }
